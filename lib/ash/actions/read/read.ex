@@ -4633,9 +4633,10 @@ defmodule Ash.Actions.Read do
 
     with {:ok, filter} <-
            filter_with_related(aggregate.query, authorize?, path_filters),
+         query = Ash.Query.filter(%{aggregate.query | filter: filter}, ^additional_filter),
          filter =
            update_aggregate_filters(
-             filter,
+             query.filter,
              aggregate.query.resource,
              authorize?,
              path_filters,
@@ -4661,7 +4662,7 @@ defmodule Ash.Actions.Read do
            ) do
       %{
         aggregate
-        | query: Ash.Query.filter(%{aggregate.query | filter: filter}, ^additional_filter),
+        | query: %{query | filter: filter},
           field: field,
           join_filters:
             add_join_filters(
